@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -6,31 +6,29 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/status')
-def status():
-    return jsonify({'message': 'Server is up and running'})
+@app.route('/math-editor', methods=['GET', 'POST'])
+def math_editor():
+    result = None
+    operation = None
 
-@app.route('/calculate', methods=['POST'])
-def calculate():
-    data = request.json
-    operation = data.get('operation')
-    num1 = float(data.get('num1'))
-    num2 = float(data.get('num2'))
+    if request.method == 'POST':
+        try:
+            value1 = float(request.form['value1'])
+            value2 = float(request.form['value2'])
+            operation = request.form['operation']
+            
+            if operation == 'add':
+                result = value1 + value2
+            elif operation == 'subtract':
+                result = value1 - value2
+            elif operation == 'multiply':
+                result = value1 * value2
+            elif operation == 'divide':
+                result = value1 / value2 if value2 != 0 else 'Error (division by zero)'
+        except ValueError:
+            result = 'Invalid input'
 
-    if operation == 'add':
-        result = num1 + num2
-    elif operation == 'subtract':
-        result = num1 - num2
-    elif operation == 'multiply':
-        result = num1 * num2
-    elif operation == 'divide':
-        if num2 == 0:
-            return jsonify({'error': 'Cannot divide by zero'}), 400
-        result = num1 / num2
-    else:
-        return jsonify({'error': 'Invalid operation'}), 400
-
-    return jsonify({'result': result})
+    return render_template('math_editor.html', result=result, operation=operation)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
