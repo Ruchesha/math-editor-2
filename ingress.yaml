@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: math-editor-ingress
+  namespace: math-editor-app
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: "maths.com"
+    http:
+      paths:
+      - path: /opr
+        pathType: Prefix
+        backend:
+          service:
+            name: math-editor-service
+            port:
+              number: 5000
