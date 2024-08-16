@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: math-editor-deployment
+  namespace: math-editor-app
+  labels:
+    app: math-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: math-app
+  template:
+    metadata:
+      labels:
+        app: math-app
+    spec:
+      containers:
+      - name: math-opr
+        image: ruchalis/math-opr:v1
+        ports:
+        - name: http
+          containerPort: 5000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: math-editor-service
+  namespace: math-editor-app
+  labels:
+    app: math-app
+spec:
+  type: ClusterIP
+  selector:
+    app: math-app
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+
